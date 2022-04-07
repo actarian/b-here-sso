@@ -10,14 +10,14 @@ const Cache = require('./cache/cache');
 
 function serve(options) {
 
-	const PORT = process.env.PORT || 5000;
+	const PORT = 5000;
 	const PORT_HTTPS = 9443;
 
 	options = options || {};
 	options.dirname = options.dirname || path.join(__dirname, '../');
 	options.name = options.name || 'bhere-sso';
 	options.baseHref = options.baseHref || `/${options.name}/`;
-	options.port = options.port || PORT;
+	options.port = process.env.PORT || options.port || PORT;
 	options.portHttps = options.portHttps || PORT_HTTPS;
 	console.log('serve', options);
 
