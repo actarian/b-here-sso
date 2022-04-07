@@ -1,4 +1,4 @@
-const config = require("../config/config");
+const config = require("../sso/sso.config");
 
 const CACHE = {
 	// A temporary cahce to store all the application that has login using the current session.
@@ -10,7 +10,8 @@ const CACHE = {
 };
 
 function getAppName(origin) {
-	return config.originAppName[origin];
+	const app = config.sso.apps.find(app => app.origin === origin);
+	return app.name;
 }
 
 function setToken(origin, id, token) {

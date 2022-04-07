@@ -3,7 +3,7 @@ const morgan = require('morgan');
 const app = express();
 const engine = require('ejs-mate');
 const session = require('express-session');
-const sso = require('./routers/sso/sso.router');
+const ssoRouter = require('./sso/sso.router');
 const fs = require('fs');
 const https = require('https');
 const Cache = require('./cache/cache');
@@ -47,7 +47,7 @@ function serve(options) {
 	app.set('views', options.dirname + '/views');
 	app.set('view engine', 'ejs');
 
-	app.use('/sso', sso);
+	app.use('/sso', ssoRouter);
 
 	app.get('/', (req, res, next) => {
 		const user = req.session.user || null;

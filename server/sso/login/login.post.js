@@ -1,7 +1,7 @@
 
 const URL = require('url').URL;
-const { db, createUUID, findUser } = require('../../../data/data');
-const Cache = require('../../../cache/cache');
+const { createUUID, findUser } = require('../../data/data');
+const Cache = require('../../cache/cache');
 
 function loginPost(req, res, next) {
 	// do the validation with email and password

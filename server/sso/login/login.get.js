@@ -1,8 +1,8 @@
 
 const URL = require('url').URL;
-const { createUUID } = require('../../../data/data');
-const config = require('../../../config/config');
-const Cache = require('../../../cache/cache');
+const { createUUID } = require('../../data/data');
+const config = require('../sso.config');
+const Cache = require('../../cache/cache');
 
 function loginGet(req, res, next) {
 	// The req.query will have the redirect url where we need to redirect after successful
@@ -13,7 +13,8 @@ function loginGet(req, res, next) {
 	// direct access will give the error inside new URL.
 	if (redirectUrl != null) {
 		const url = new URL(redirectUrl);
-		if (config.allowedOrigin[url.origin] !== true) {
+		const app = config.sso.apps.find(app => app.origin === url.origin);
+		if (!app) {
 			return res
 				.status(400)
 				.json({ message: 'Your are not allowed to access the sso-server' });
