@@ -7,6 +7,9 @@ const ssoRouter = require('./sso/sso.router');
 const fs = require('fs');
 const https = require('https');
 const Cache = require('./cache/cache');
+const cookieParser = require('cookie-parser');
+// const favicon = require('serve-favicon');
+// const path = require('path');
 
 function serve(options) {
 
@@ -29,10 +32,12 @@ function serve(options) {
 		saveUninitialized: true,
 		resave: true
 	}));
+	app.use(cookieParser());
 	app.disable('x-powered-by');
 	app.use(express.urlencoded({ extended: true }));
 	app.use(express.json());
 	app.use(express.raw());
+	// app.use(favicon(path.join(options.dirname, 'public', 'favicon.ico')))
 	/*
 	app.use((req, res, next) => {
 	  console.log(req.session);
