@@ -1,6 +1,6 @@
 
 const URL = require('url').URL;
-const { createUUID } = require('../../data/data');
+const { createUUID } = require('../../shared/utils');
 const config = require('../sso.config');
 const Cache = require('../../cache/cache');
 
@@ -28,9 +28,9 @@ function loginGet(req, res, next) {
 	// if global session already has the user directly redirect with the token
 	if (req.session.user != null && redirectUrl != null) {
 		const url = new URL(redirectUrl);
-		const ssoToken = createUUID();
-		Cache.cacheApplication(url.origin, req.session.user, ssoToken);
-		return res.redirect(`${redirectUrl}?ssoToken=${ssoToken}`);
+		const verifyToken = createUUID();
+		Cache.cacheApplication(url.origin, req.session.user, verifyToken);
+		return res.redirect(`${redirectUrl}?verifyToken=${verifyToken}`);
 	}
 
 	return res.render('login', {

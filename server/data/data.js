@@ -1,15 +1,4 @@
-const uuidv4 = require('uuid/v4');
-const Hashids = require('hashids');
-const hashids = new Hashids();
-
-const deHyphenatedUUID = () => uuidv4().replace(/-/gi, '');
-const createUUID = () => hashids.encodeHex(deHyphenatedUUID());
-
-// install extensions
-// es6-string-html
-// es6-string-javascript
-// ESLint
-// TSLint
+const { findItemInCollection, createUUID } = require('../shared/utils');
 
 const userId = createUUID();
 
@@ -28,21 +17,6 @@ const db = {
 		scope: 'id, firstName, lastName, email, role',
 	}],
 };
-
-function findItemInCollection(values, collection) {
-	const keys = Object.keys(values);
-	const index = collection.reduce((p, c, i) => {
-		const match = keys.reduce((m, key) => {
-			return m && c[key] === values[key];
-		}, true);
-		return match ? i : p;
-	}, -1);
-	if (index !== -1) {
-		return collection[index];
-	} else {
-		return null;
-	}
-}
 
 function findUser(values) {
 	const user = findItemInCollection(values, db.users);
@@ -74,10 +48,6 @@ class User {
 }
 
 module.exports = {
-	db,
-	findItemInCollection,
 	findUser,
 	findPolicy,
-	createUUID,
-	User,
 };

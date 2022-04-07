@@ -1,6 +1,7 @@
 
 const URL = require('url').URL;
-const { createUUID, findUser } = require('../../data/data');
+const { createUUID } = require('../../shared/utils');
+const { findUser } = require('../../data/data');
 const Cache = require('../../cache/cache');
 
 function loginPost(req, res, next) {
@@ -21,9 +22,9 @@ function loginPost(req, res, next) {
 		return res.redirect('/');
 	}
 	const url = new URL(redirectUrl);
-	const ssoToken = createUUID();
-	Cache.cacheApplication(url.origin, id, ssoToken);
-	return res.redirect(`${redirectUrl}?ssoToken=${ssoToken}`);
+	const verifyToken = createUUID();
+	Cache.cacheApplication(url.origin, id, verifyToken);
+	return res.redirect(`${redirectUrl}?verifyToken=${verifyToken}`);
 };
 
 module.exports = loginPost;

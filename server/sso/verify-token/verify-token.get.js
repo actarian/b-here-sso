@@ -16,7 +16,7 @@ async function verifyTokenGet(req, res, next) {
 	const [sessionToken, appName] = Cache.getToken(verifyToken);
 	// If the bearer is not equal to token given during the sso app registration or later stage than invalid
 	const app = config.sso.apps.find(app => app.name === appName);
-	if (!app || app.bearer !== bearer || !Cache.hasApplicationName(sessionToken, appName)) {
+	if (!app || app.secret !== bearer || !Cache.hasApplicationName(sessionToken, appName)) {
 		return res.status(403).json({ message: 'Unauthorized' });
 	}
 	// checking if the token passed has been generated
