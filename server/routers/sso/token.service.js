@@ -1,9 +1,9 @@
 const jwt = require('jsonwebtoken');
 const Cache = require('../../cache/cache');
 const config = require('../../config/config');
-const { db } = require('../../data/data');
+const { db, findUser } = require('../../data/data');
 const keys = config.keys;
-const ssoPrivateCert = keys.ssoPrivateCert;
+const ssoPrivateKey = keys.ssoPrivateKey;
 
 function createToken(payload) {
 	return new Promise((resolve, reject) => {
@@ -14,7 +14,7 @@ function createToken(payload) {
 		payload = { ...payload };
 		options = { algorithm: 'RS256', expiresIn: '1h', issuer: config.issuer };
 
-		jwt.sign(payload, ssoPrivateCert, options, (error, token) => {
+		jwt.sign(payload, ssoPrivateKey, options, (error, token) => {
 			if (error) {
 				return reject(error);
 			}
@@ -25,10 +25,10 @@ function createToken(payload) {
 
 function getTokenPayload(ssoToken) {
 	const [globalSessionToken, appName] = Cache.getToken(ssoToken);
-	const userEmail = Cache.getUser(globalSessionToken);
-	const user = db.users[userEmail];
+	const email = Cache.getUser(globalSessionToken);
+	const user = findUser({ email });
 	const appPolicy = user.appPolicy[appName];
-	const email = appPolicy.shareEmail === true ? userEmail : undefined;
+	const email = appPolicy.shareEmail === true ? email : undefined;
 	const payload = {
 		...appPolicy,
 		email,

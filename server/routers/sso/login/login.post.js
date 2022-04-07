@@ -1,6 +1,6 @@
 
 const URL = require('url').URL;
-const { db, createUUID } = require('../../../data/data');
+const { db, createUUID, findUser } = require('../../../data/data');
 const Cache = require('../../../cache/cache');
 
 function loginPost(req, res, next) {
@@ -8,10 +8,10 @@ function loginPost(req, res, next) {
 	// but the goal is not to do the same in this right now,
 	// like checking with Datebase and all, we are skiping these section
 	const { email, password } = req.body;
-	if (!(db.users[email] && password === db.users[email].password)) {
+	const user = findUser({ email, password });
+	if (!user) {
 		return res.status(404).json({ message: 'Invalid email and password' });
 	}
-
 	// else redirect
 	const { redirectUrl } = req.query;
 	const id = createUUID();
