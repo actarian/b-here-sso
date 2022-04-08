@@ -6,12 +6,10 @@ const session = require('express-session');
 const ssoRouter = require('./sso/sso.router');
 const fs = require('fs');
 const https = require('https');
-const Cache = require('./cache/cache');
 const cookieParser = require('cookie-parser');
-const Cookie = require('./cookie/cookie');
-const { findUser } = require('./data/data');
-// const favicon = require('serve-favicon');
-// const path = require('path');
+const favicon = require('serve-favicon');
+const path = require('path');
+const indexGet = require('./sso/index/index.get');
 
 function serve(options) {
 
@@ -39,7 +37,8 @@ function serve(options) {
 	app.use(express.urlencoded({ extended: true }));
 	app.use(express.json());
 	app.use(express.raw());
-	// app.use(favicon(path.join(options.dirname, 'public', 'favicon.ico')))
+	app.use(favicon(path.join(options.dirname, 'public', 'favicon.ico')))
+
 	/*
 	app.use((req, res, next) => {
 	  console.log(req.session);
@@ -56,15 +55,7 @@ function serve(options) {
 
 	app.use('/sso', ssoRouter);
 
-	app.get('/', (req, res, next) => {
-		const identity = Cookie.get(req, 'identity');
-		const user = identity ? findUser({ id: identity.userId }) : null;
-		res.render('index', {
-			title: 'BHere SSO - Index',
-			user: user,
-			// cache: JSON.stringify(Cache.cache),
-		});
-	});
+	app.get('/', indexGet);
 
 	// 404
 	app.use((req, res, next) => {

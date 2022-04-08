@@ -1,8 +1,8 @@
 
 const URL = require('url').URL;
 const config = require('../sso.config');
-const Cache = require('../../cache/cache');
-const Cookie = require('../../cookie/cookie');
+const Cookie = require('../../core/cookie/cookie');
+const Token = require('../../core/token/token');
 
 function logoutGet(req, res, next) {
 	const { redirectUrl } = req.query;
@@ -17,7 +17,11 @@ function logoutGet(req, res, next) {
 		}
 	}
 
-	Cookie.delete(res, 'identity');
+	const identity = Cookie.get(req, 'identity');
+	if (identity) {
+		Cookie.delete(res, 'identity');
+		Token.delete(identity.id);
+	}
 
 	if (redirectUrl == null) {
 		return res.redirect('/');

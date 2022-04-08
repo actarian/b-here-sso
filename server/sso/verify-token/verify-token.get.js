@@ -1,32 +1,46 @@
-const Request = require('../../request/request');
-const Cache = require('../../cache/cache');
+const Request = require('../../core/request/request');
 const config = require('../sso.config');
 const { requestToken } = require('../sso-token.service');
-const Cookie = require('../../cookie/cookie');
+const Token = require('../../core/token/token');
+const { findUser } = require('../../core/data/data');
 
+// !!! server to server, no cookies here
 async function verifyTokenGet(req, res, next) {
-	const bearer = Request.getAuthorizationBearer(req);
 	const { verifyToken } = req.query;
-	// if the application token is not present or verifyToken request is invalid
-	// if the verifyToken is not present in the cache some is
-	// smart.
-	const identity = Cookie.get(req, 'identity');
-	const verify = verifyToken ? Cookie.get(req, 'verify') : null;
-	console.log(identity, verify, bearer, identity);
-	if (bearer == null || verifyToken == null || identity == null || verify == null) {
+	// console.log('verifyTokenGet.verifyToken', verifyToken);
+	if (!verifyToken) {
 		return res.status(400).json({ message: 'badRequest' });
 	}
-	// if the bearer is present and check if it's valid for the application
-	const app = config.sso.apps.find(app => app.origin === verify.origin);
-
-	if (!app || app.secret !== bearer) {
+	const verify = Token.get(verifyToken);
+	// console.log('verifyTokenGet.verify', verify);
+	if (!verify) {
+		return res.status(400).json({ message: 'badRequest' });
+	}
+	const bearer = Request.getAuthorizationBearer(req);
+	// console.log('verifyTokenGet.bearer', bearer);
+	if (!bearer) {
+		return res.status(400).json({ message: 'badRequest' });
+	}
+	const app = config.sso.apps.find(app => {
+		return app.secret === bearer && app.origin === verify.origin;
+	});
+	// console.log('verifyTokenGet.app', app);
+	if (!app) {
 		return res.status(403).json({ message: 'Unauthorized' });
 	}
-
-	// checking if the token passed has been generated
-	const token = await requestToken(verify, identity);
-
-	Cookie.delete('verify');
+	const identity = Token.get(verify.identityId);
+	// console.log('verifyTokenGet.identity', identity);
+	if (!identity) {
+		return res.status(403).json({ message: 'Unauthorized' });
+	}
+	const user = findUser({ id: identity.userId });
+	// console.log('verifyTokenGet.user', user);
+	if (!user) {
+		return res.status(404).json({ message: 'Not Found' });
+	}
+	const token = await requestToken(identity.id, user, app);
+	// console.log('verifyTokenGet.token', token);
+	Token.delete(verifyToken);
 	return res.status(200).json({ token });
 };
 

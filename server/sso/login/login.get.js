@@ -1,9 +1,9 @@
 
 const URL = require('url').URL;
-const { createUUID } = require('../../shared/utils');
+const { createUUID } = require('../../core/utils/utils');
 const config = require('../sso.config');
-const Cache = require('../../cache/cache');
-const Cookie = require('../../cookie/cookie');
+const Cookie = require('../../core/cookie/cookie');
+const Token = require('../../core/token/token');
 
 function loginGet(req, res, next) {
 	// The req.query will have the redirect url where we need to redirect after successful
@@ -23,16 +23,14 @@ function loginGet(req, res, next) {
 	}
 
 	const identity = Cookie.get(req, 'identity');
-
 	if (identity != null) {
+		Token.set(identity.id, identity);
 		// if global session already has the user directly redirect with the token
 		if (redirectUrl != null) {
 			const url = new URL(redirectUrl);
 			const origin = url.origin;
-
-			const verify = { id: createUUID(), identityId: identity.id, origin };
-			Cookie.set(req, res, 'verify', verify, 30 * 1000); // 30 seconds
-
+			const verify = { id: createUUID(), identityId: identity.id, origin, expireAt: new Date(Date.now() + 30 * 1000) }; // 30 seconds
+			Token.set(verify.id, verify);
 			return res.redirect(`${redirectUrl}?verifyToken=${verify.id}`);
 		} else {
 			return res.redirect('/');

@@ -1,7 +1,5 @@
 const jwt = require('jsonwebtoken');
-const Cache = require('../cache/cache');
 const config = require('./sso.config');
-const { findUser } = require('../data/data');
 
 function createToken(payload) {
 	return new Promise((resolve, reject) => {
@@ -19,13 +17,11 @@ function createToken(payload) {
 	});
 }
 
-function getTokenPayload(verify, identity) {
-	const user = findUser({ id: identity.userId });
-	const app = config.sso.apps.find(app => app.origin === verify.origin);
-	console.log('TokenService.getTokenPayload', identity.id, user, app);
+function getTokenPayload(sessionId, user, app) {
+	console.log('TokenService.getTokenPayload', user, app);
 	const userPayload = user.getPayload(app.scope);
 	return {
-		session: identity.id,
+		sessionId: sessionId,
 		user: userPayload,
 		app: {
 			name: app.name,
@@ -34,8 +30,8 @@ function getTokenPayload(verify, identity) {
 	};
 }
 
-function requestToken(verify, identity) {
-	const payload = getTokenPayload(verify, identity);
+function requestToken(sessionId, user, app) {
+	const payload = getTokenPayload(sessionId, user, app);
 	return createToken(payload);
 }
 

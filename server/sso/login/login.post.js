@@ -1,9 +1,9 @@
 
 const URL = require('url').URL;
-const { createUUID } = require('../../shared/utils');
-const { findUser } = require('../../data/data');
-const Cache = require('../../cache/cache');
-const Cookie = require('../../cookie/cookie');
+const { createUUID } = require('../../core/utils/utils');
+const { findUser } = require('../../core/data/data');
+const Cookie = require('../../core/cookie/cookie');
+const Token = require('../../core/token/token');
 
 function loginPost(req, res, next) {
 	// do the validation with email and password
@@ -17,6 +17,7 @@ function loginPost(req, res, next) {
 
 	const identity = { id: createUUID(), userId: user.id };
 	Cookie.set(req, res, 'identity', identity);
+	Token.set(identity.id, identity);
 
 	const { redirectUrl } = req.query;
 	if (redirectUrl == null) {
@@ -26,26 +27,10 @@ function loginPost(req, res, next) {
 	const url = new URL(redirectUrl);
 	const origin = url.origin;
 
-	const verify = { id: createUUID(), identityId: identity.id, origin };
-	Cookie.set(req, res, 'verify', verify, 30 * 1000); // 30 seconds
+	const verify = { id: createUUID(), identityId: identity.id, origin, expireAt: new Date(Date.now() + 30 * 1000) }; // 30 seconds
+	Token.set(verify.id, verify);
 
 	return res.redirect(`${redirectUrl}?verifyToken=${verify.id}`);
-
-	/*
-	to get a cookie from an incoming request ..
-	let cookie = req.cookies['cookiename'];
-	to set a response cookie (this cookie will be sent on all future incoming requests until deletion or expiration) ..
-	res.cookie('cookiename', 'cookievalue', {
-		maxAge: 86400 * 1000, // 24 hours
-		httpOnly: true, // http only, prevents JavaScript cookie access
-		secure: (req.protocol === 'https') // cookie must be sent over https / ssl
-	});
-	to delete a response cookie ..
-	res.cookie('cookiename', 'cookievalue', {
-		maxAge: 0
-	});
-	*/
-
 };
 
 module.exports = loginPost;

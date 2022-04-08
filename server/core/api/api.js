@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { createUUID } = require('../shared/utils');
+const { createUUID } = require('../utils/utils');
 
 const RoleType = {
 	Publisher: 'publisher',
