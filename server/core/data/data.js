@@ -1,6 +1,7 @@
 const { findItemInCollection, createUUID, readFileSync } = require('../utils/utils');
 
 class User {
+
 	constructor(user) {
 		if (typeof user === 'object') {
 			Object.assign(this, user);
@@ -15,6 +16,7 @@ class User {
 		});
 		return user;
 	}
+
 }
 
 const SSO_DB = process.env.SSO_DB || readFileSync(__dirname, '../../../data/data.json');
@@ -25,6 +27,22 @@ function findUser(values) {
 	return user ? new User(user) : null;
 }
 
+function findApp(values) {
+	const app = findItemInCollection(values, db.apps);
+	return app ? app : null;
+}
+
+function findAppByOrigin(origin) {
+	return db.apps.find(app => app.origin.split(',').map(x => x.trim()).includes(origin)) || null;
+}
+
+function findAppByOriginAndBearer(origin, bearer) {
+	return db.apps.find(app => app.secret === bearer && app.origin.split(',').map(x => x.trim()).includes(origin)) || null;
+}
+
 module.exports = {
 	findUser,
+	findApp,
+	findAppByOrigin,
+	findAppByOriginAndBearer,
 };

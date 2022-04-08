@@ -10,7 +10,7 @@ function setCookie(req, res, key, value, maxAge = 30 * 24 * 3600 * 1000) {
 		res.cookie(key, encode(value), {
 			httpOnly: true,
 			secure: (req.protocol === 'https'), // cookie must be sent over https / ssl
-			sameSite: 'strict',
+			sameSite: 'lax', // 'strict' or 'lax' or 'none'
 			maxAge: maxAge,
 		});
 	}

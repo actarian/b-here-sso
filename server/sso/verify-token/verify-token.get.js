@@ -1,8 +1,7 @@
 const Request = require('../../core/request/request');
-const config = require('../sso.config');
 const { requestToken } = require('../sso-token.service');
 const Token = require('../../core/token/token');
-const { findUser } = require('../../core/data/data');
+const { findUser, findAppByOriginAndBearer } = require('../../core/data/data');
 
 // !!! server to server, no cookies here
 async function verifyTokenGet(req, res, next) {
@@ -21,9 +20,7 @@ async function verifyTokenGet(req, res, next) {
 	if (!bearer) {
 		return res.status(400).json({ message: 'badRequest' });
 	}
-	const app = config.sso.apps.find(app => {
-		return app.secret === bearer && app.origin === verify.origin;
-	});
+	const app = findAppByOriginAndBearer(verify.origin, bearer);
 	// console.log('verifyTokenGet.app', app);
 	if (!app) {
 		return res.status(403).json({ message: 'Unauthorized' });

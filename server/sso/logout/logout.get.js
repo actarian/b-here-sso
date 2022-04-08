@@ -1,15 +1,15 @@
 
 const URL = require('url').URL;
-const config = require('../sso.config');
 const Cookie = require('../../core/cookie/cookie');
 const Token = require('../../core/token/token');
+const { findAppByOrigin } = require('../../core/data/data');
 
 function logoutGet(req, res, next) {
 	const { redirectUrl } = req.query;
 	// direct access will give the error inside new URL.
 	if (redirectUrl != null) {
 		const url = new URL(redirectUrl);
-		const app = config.sso.apps.find(app => app.origin === url.origin);
+		const app = findAppByOrigin(url.origin);
 		if (!app) {
 			return res
 				.status(400)

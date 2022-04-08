@@ -8,5 +8,11 @@
       "lastName": "Appleseed",
       "role": "Dealer"
     }
-  ]
+  ],
+  "apps": [{
+    "secret": "l1Q7zkOL59cRqWBkQ12ZiGVW2DBL",
+    "name": "bhere-sso-consumer",
+    "scope": "id, email, firstName, lastName, role",
+    "origin": "http://localhost:3020, https://localhost:6443"
+  }]
 }

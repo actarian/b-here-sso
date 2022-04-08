@@ -1,9 +1,9 @@
 
 const URL = require('url').URL;
 const { createUUID } = require('../../core/utils/utils');
-const config = require('../sso.config');
 const Cookie = require('../../core/cookie/cookie');
 const Token = require('../../core/token/token');
+const { findAppByOrigin } = require('../../core/data/data');
 
 function loginGet(req, res, next) {
 	// The req.query will have the redirect url where we need to redirect after successful
@@ -14,7 +14,7 @@ function loginGet(req, res, next) {
 	// direct access will give the error inside new URL.
 	if (redirectUrl != null) {
 		const url = new URL(redirectUrl);
-		const app = config.sso.apps.find(app => app.origin === url.origin);
+		const app = findAppByOrigin(url.origin);
 		if (!app) {
 			return res
 				.status(400)
@@ -23,6 +23,7 @@ function loginGet(req, res, next) {
 	}
 
 	const identity = Cookie.get(req, 'identity');
+	console.log('loginGet.identity', identity, req.url);
 	if (identity != null) {
 		Token.set(identity.id, identity);
 		// if global session already has the user directly redirect with the token
