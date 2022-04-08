@@ -1,9 +1,16 @@
+const fs = require('fs');
+const path = require('path');
 const uuidv4 = require('uuid/v4');
 const Hashids = require('hashids');
 const hashids = new Hashids();
 
 const deHyphenatedUUID = () => uuidv4().replace(/-/gi, '');
 const createUUID = () => hashids.encodeHex(deHyphenatedUUID());
+
+function readFileSync(...components) {
+	const keyUrl = path.resolve(...components);
+	return fs.readFileSync(keyUrl, 'utf8');
+}
 
 function toBase64(value) {
 	return Buffer.from(value).toString('base64');
@@ -37,6 +44,7 @@ function findItemInCollection(values, collection) {
 }
 
 module.exports = {
+	readFileSync,
 	findItemInCollection,
 	createUUID,
 	encode,

@@ -1,4 +1,4 @@
-const { findItemInCollection, createUUID } = require('../utils/utils');
+const { findItemInCollection, createUUID, readFileSync } = require('../utils/utils');
 
 class User {
 	constructor(user) {
@@ -17,16 +17,8 @@ class User {
 	}
 }
 
-const db = {
-	users: [{
-		id: '5pX1D1OMy7fkr0wvmAW3CzvA6lK6',
-		email: 'test@test.com',
-		password: 'test',
-		firstName: 'John',
-		lastName: 'Appleseed',
-		role: 'Dealer',
-	}],
-};
+const SSO_DB = process.env.SSO_DB || readFileSync(__dirname, '../../../data/data.json');
+const db = JSON.parse(SSO_DB);
 
 function findUser(values) {
 	const user = findItemInCollection(values, db.users);

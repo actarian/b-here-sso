@@ -1,3 +1,12 @@
 {
-    "users": []
+  "users": [
+    {
+      "id": "5pX1D1OMy7fkr0wvmAW3CzvA6lK6",
+      "email": "test@test.com",
+      "password": "test",
+      "firstName": "John",
+      "lastName": "Appleseed",
+      "role": "Dealer"
+    }
+  ]
 }

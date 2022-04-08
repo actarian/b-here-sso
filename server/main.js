@@ -4,12 +4,12 @@ const app = express();
 const engine = require('ejs-mate');
 const session = require('express-session');
 const ssoRouter = require('./sso/sso.router');
-const fs = require('fs');
 const https = require('https');
 const cookieParser = require('cookie-parser');
 const favicon = require('serve-favicon');
 const path = require('path');
 const indexGet = require('./sso/index/index.get');
+const { readFileSync } = require('./core/utils/utils');
 
 function serve(options) {
 
@@ -37,24 +37,12 @@ function serve(options) {
 	app.use(express.urlencoded({ extended: true }));
 	app.use(express.json());
 	app.use(express.raw());
-	app.use(favicon(path.join(options.dirname, 'public', 'favicon.ico')))
-
-	/*
-	app.use((req, res, next) => {
-	  console.log(req.session);
-	  next();
-	});
-	*/
-
+	app.use(favicon(path.join(options.dirname, 'public', 'favicon.ico')));
 	app.use(morgan('dev'));
-
 	app.engine('ejs', engine);
-
 	app.set('views', options.dirname + '/views');
 	app.set('view engine', 'ejs');
-
 	app.use('/sso', ssoRouter);
-
 	app.get('/', indexGet);
 
 	// 404
@@ -84,8 +72,8 @@ function serve(options) {
 
 	const heroku = (process.env._ && process.env._.indexOf('heroku'));
 	if (!heroku) {
-		const privateKey = fs.readFileSync('cert.key', 'utf8');
-		const certificate = fs.readFileSync('cert.crt', 'utf8');
+		const privateKey = readFileSync(options.dirname, './cert.key');
+		const certificate = readFileSync(options.dirname, './cert.crt');
 		const credentials = { key: privateKey, cert: certificate };
 		const serverHttps = https.createServer(credentials, app);
 		serverHttps.listen(options.portHttps, () => {
