@@ -15,13 +15,8 @@ function loginPost(req, res, next) {
 		return res.status(404).json({ message: 'Invalid email and password' });
 	}
 
-	// !!!
-	const id = createUUID();
-	req.session.user = id;
-	Cache.setUser(id, email);
-
-	const identityCookie = { id: createUUID(), userId: user.id };
-	Cookie.set(req, res, 'identity', identityCookie);
+	const identity = { id: createUUID(), userId: user.id };
+	Cookie.set(req, res, 'identity', identity);
 
 	const { redirectUrl } = req.query;
 	if (redirectUrl == null) {
@@ -31,12 +26,10 @@ function loginPost(req, res, next) {
 	const url = new URL(redirectUrl);
 	const origin = url.origin;
 
-	const verifyCookie = { id: createUUID(), identityId: identityCookie.id, origin };
-	Cookie.set(req, res, 'verify', verifyCookie, 30 * 1000); // 30 seconds
+	const verify = { id: createUUID(), identityId: identity.id, origin };
+	Cookie.set(req, res, 'verify', verify, 30 * 1000); // 30 seconds
 
-	const verifyToken = createUUID();
-	Cache.cacheApplication(origin, id, verifyToken);
-	return res.redirect(`${redirectUrl}?verifyToken=${verifyToken}`);
+	return res.redirect(`${redirectUrl}?verifyToken=${verify.id}`);
 
 	/*
 	to get a cookie from an incoming request ..

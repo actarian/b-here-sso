@@ -8,6 +8,8 @@ const fs = require('fs');
 const https = require('https');
 const Cache = require('./cache/cache');
 const cookieParser = require('cookie-parser');
+const Cookie = require('./cookie/cookie');
+const { findUser } = require('./data/data');
 // const favicon = require('serve-favicon');
 // const path = require('path');
 
@@ -55,11 +57,12 @@ function serve(options) {
 	app.use('/sso', ssoRouter);
 
 	app.get('/', (req, res, next) => {
-		const user = req.session.user || null;
+		const identity = Cookie.get(req, 'identity');
+		const user = identity ? findUser({ id: identity.userId }) : null;
 		res.render('index', {
 			title: 'BHere SSO - Index',
 			user: user,
-			cache: JSON.stringify(Cache.cache),
+			// cache: JSON.stringify(Cache.cache),
 		});
 	});
 

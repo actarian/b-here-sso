@@ -2,6 +2,7 @@
 const URL = require('url').URL;
 const config = require('../sso.config');
 const Cache = require('../../cache/cache');
+const Cookie = require('../../cookie/cookie');
 
 function logoutGet(req, res, next) {
 	const { redirectUrl } = req.query;
@@ -16,15 +17,14 @@ function logoutGet(req, res, next) {
 		}
 	}
 
-	req.session.user = null;
+	Cookie.delete(res, 'identity');
 
 	if (redirectUrl == null) {
 		return res.redirect('/');
 	}
 
 	if (redirectUrl != null) {
-		const url = new URL(redirectUrl);
-		Cache.deleteApplication(url.origin);
+		// const url = new URL(redirectUrl);
 		return res.redirect(`${redirectUrl}`);
 	}
 

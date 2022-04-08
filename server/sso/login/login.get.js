@@ -3,6 +3,7 @@ const URL = require('url').URL;
 const { createUUID } = require('../../shared/utils');
 const config = require('../sso.config');
 const Cache = require('../../cache/cache');
+const Cookie = require('../../cookie/cookie');
 
 function loginGet(req, res, next) {
 	// The req.query will have the redirect url where we need to redirect after successful
@@ -21,16 +22,21 @@ function loginGet(req, res, next) {
 		}
 	}
 
-	if (req.session.user != null && redirectUrl == null) {
-		return res.redirect('/');
-	}
+	const identity = Cookie.get(req, 'identity');
 
-	// if global session already has the user directly redirect with the token
-	if (req.session.user != null && redirectUrl != null) {
-		const url = new URL(redirectUrl);
-		const verifyToken = createUUID();
-		Cache.cacheApplication(url.origin, req.session.user, verifyToken);
-		return res.redirect(`${redirectUrl}?verifyToken=${verifyToken}`);
+	if (identity != null) {
+		// if global session already has the user directly redirect with the token
+		if (redirectUrl != null) {
+			const url = new URL(redirectUrl);
+			const origin = url.origin;
+
+			const verify = { id: createUUID(), identityId: identity.id, origin };
+			Cookie.set(req, res, 'verify', verify, 30 * 1000); // 30 seconds
+
+			return res.redirect(`${redirectUrl}?verifyToken=${verify.id}`);
+		} else {
+			return res.redirect('/');
+		}
 	}
 
 	return res.render('login', {
