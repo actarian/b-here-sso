@@ -7,9 +7,44 @@ const hashids = new Hashids();
 const deHyphenatedUUID = () => uuidv4().replace(/-/gi, '');
 const createUUID = () => hashids.encodeHex(deHyphenatedUUID());
 
+function readData(...components) {
+	return new Promise((resolve, reject) => {
+		const datapath = path.resolve(...components);
+		fs.readFile(datapath, 'utf8', (error, data) => {
+			if (error) {
+				console.log('Data.readStore.error', error, datapath);
+				reject(error);
+			} else {
+				try {
+					const data = Object.assign(db, JSON.parse(data));
+					resolve(data);
+				} catch (error) {
+					console.log('Data.readStore.error', error, datapath);
+					reject(error);
+				}
+			}
+		});
+	});
+}
+
+function saveData(data, ...components) {
+	return new Promise((resolve, reject) => {
+		const datapath = path.resolve(...components);
+		data = JSON.stringify(data, null, 2);
+		fs.writeFile(datapath, data, 'utf8', (error, data) => {
+			if (error) {
+				console.log('Data.saveStore.error', error, datapath);
+				reject(error);
+			} else {
+				resolve();
+			}
+		});
+	});
+}
+
 function readFileSync(...components) {
-	const keyUrl = path.resolve(...components);
-	return fs.readFileSync(keyUrl, 'utf8');
+	const filePath = path.resolve(...components);
+	return fs.readFileSync(filePath, 'utf8');
 }
 
 function toBase64(value) {
@@ -44,6 +79,8 @@ function findItemInCollection(values, collection) {
 }
 
 module.exports = {
+	readData,
+	saveData,
 	readFileSync,
 	findItemInCollection,
 	createUUID,

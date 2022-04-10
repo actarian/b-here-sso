@@ -1,18 +1,20 @@
 {
   "users": [
     {
-      "id": "5pX1D1OMy7fkr0wvmAW3CzvA6lK6",
-      "email": "test@test.com",
-      "password": "test",
       "firstName": "John",
       "lastName": "Appleseed",
-      "role": "Dealer"
+      "email": "test@test.com",
+      "password": "test",
+      "role": "Dealer",
+      "id": "5pX1D1OMy7fkr0wvmAW3CzvA6lK6"
     }
   ],
-  "apps": [{
-    "secret": "l1Q7zkOL59cRqWBkQ12ZiGVW2DBL",
-    "name": "bhere-sso-consumer",
-    "scope": "id, email, firstName, lastName, role",
-    "origin": "http://localhost:3020, https://localhost:6443"
-  }]
+  "apps": [
+    {
+      "secret": "l1Q7zkOL59cRqWBkQ12ZiGVW2DBL",
+      "name": "bhere-sso-consumer",
+      "scope": "id, email, firstName, lastName, role",
+      "origin": "http://localhost:3020, https://localhost:6443"
+    }
+  ]
 }
