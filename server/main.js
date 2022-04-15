@@ -27,11 +27,16 @@ function serve(options) {
 	options.host = `http://localhost:${options.port}`;
 	options.hostHttps = `https://localhost:${options.portHttps}`;
 
+	const heroku = (process.env._ && process.env._.indexOf('heroku'));
+
 	app.use(session({
 		secret: `${options.name}-secret-keyword`,
 		saveUninitialized: true,
 		resave: true
 	}));
+	if (heroku) {
+		app.enable('trust proxy');
+	}
 	app.use(cookieParser());
 	app.disable('x-powered-by');
 	app.use(express.urlencoded({ extended: true }));
@@ -70,7 +75,6 @@ function serve(options) {
 		console.info(`${options.name} running server at ${options.host}`);
 	});
 
-	const heroku = (process.env._ && process.env._.indexOf('heroku'));
 	if (!heroku) {
 		const privateKey = readFileSync(options.dirname, './cert.key');
 		const certificate = readFileSync(options.dirname, './cert.crt');
