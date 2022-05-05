@@ -14,7 +14,7 @@
       "secret": "l1Q7zkOL59cRqWBkQ12ZiGVW2DBL",
       "name": "bhere-sso-consumer",
       "scope": "id, email, firstName, lastName, role",
-      "origin": "http://localhost:3020, https://localhost:6443, https://b-here-sso-consumer.herokuapp.com"
+      "origin": "http://localhost:3020, https://localhost:6443, https://localhost:44315, https://b-here-sso-consumer.herokuapp.com"
     }
   ]
 }
