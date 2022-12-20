@@ -27,14 +27,15 @@ function serve(options) {
 	options.host = `http://localhost:${options.port}`;
 	options.hostHttps = `https://localhost:${options.portHttps}`;
 
-	const heroku = (process.env._ && process.env._.indexOf('heroku'));
+	const heroku = (process.env._ && process.env._.indexOf('heroku') !== -1);
+	const vercelUrl = process.env.VERCEL_URL;
 
 	app.use(session({
 		secret: `${options.name}-secret-keyword`,
 		saveUninitialized: true,
 		resave: true
 	}));
-	if (heroku) {
+	if (heroku || vercelUrl) {
 		app.enable('trust proxy');
 	}
 	app.use(cookieParser());
@@ -75,7 +76,7 @@ function serve(options) {
 		console.info(`${options.name} running server at ${options.host}`);
 	});
 
-	if (!heroku) {
+	if (!heroku && !vercelUrl) {
 		const privateKey = readFileSync(options.dirname, './cert.key');
 		const certificate = readFileSync(options.dirname, './cert.crt');
 		const credentials = { key: privateKey, cert: certificate };
