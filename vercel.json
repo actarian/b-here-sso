@@ -11,8 +11,9 @@
       "config": {
         "includeFiles": [
           "data/**/*.json",
-          "views/**/*.ejs",
-          "server/sso/sso.key"
+          "public/**",
+          "server/sso/sso.key",
+          "views/**/*.ejs"
         ]
       }
     },
